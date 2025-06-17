@@ -1,6 +1,6 @@
-const { supabse } = require('../config/supabase');
+const supabase = require('../config/supabase');
 
-class Associaçao{
+class Associacao{
 
     static async findAll() {
         const{data, error} = await supabase
