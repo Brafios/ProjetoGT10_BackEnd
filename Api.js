@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 const API = axios.create({
-        baseURL: 'projeto-gt-10-back-end.vercel.app'
+        baseURL: 'http://localhost:3000'
     })
  
 export default API;
