@@ -9,5 +9,5 @@ app.use(express.json());
 app.use('/auth', AuthRoute);
 
 app.listen(3000, () => {
-  console.log('Servidor rodando em http://localhost:3000');
+  console.log('Servidor rodando em projeto-gt-10-back-end.vercel.app');
 });
