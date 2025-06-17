@@ -2,7 +2,7 @@ const Associacao = require('../models/AssociationModel');
 
 class AssociacaoController {
 
-    static async lis(req, res) {
+    static async list(req, res) {
         const associacoes = await Associacao.findAll();
         res.json({ success: true, data: associacoes});
 

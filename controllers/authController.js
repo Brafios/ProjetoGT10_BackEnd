@@ -1,4 +1,3 @@
-
 const supabase = require("../config/supabase");
 const { criarPerfil } = require('../models/UserModel');
 

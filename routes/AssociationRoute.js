@@ -1,7 +1,5 @@
-
-
 const express = require('express');
-const router = express.router();
+const router = express.Router();
 const associacaoController = require('../controllers/AssociationController')
 
 router.get('/', associacaoController.list);
