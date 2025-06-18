@@ -121,7 +121,49 @@ const login = async (req, res) => {
   }
 };
 
+const recuperarSenha = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email){
+    return res.status(400).json({ error: "O e-mail é obrigatório."})
+  }
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://projeto-gt-10-full-stack.vercel.app/update-password',
+  });
+
+  if (error){
+    console.error(error);
+    return res.status(500).json({ error: "Erro ao processar a solicitação."});
+  }
+
+  return res.status(200).json({ message: "Se o e-mail estiver cadastrado, um link será enviado"})
+}
+
+const atualizarSenha = async (req, res) => {
+  const { password, acessToken } = req.body
+
+  if (!password || !acessToken){
+    return res.status(400).json({ error: "Nova senha e token de acesso são obrigatórios"})
+  }
+
+  const { data, error } = await supabase.auth.updateUser(
+    {password: password},
+    {jwt: acessToken}
+  )
+
+  if (error) {
+    console.error(error);
+    return res.status(401).json({ error: "Token inválido ou expirado. Por favor, solicite um novo link"})
+  }
+
+  return res.status(200).json({ message: "Senha Atualizada com sucesso"})
+
+}
+
 module.exports = { 
   registro, 
-  login
+  login,
+  atualizarSenha,
+  recuperarSenha
 };
