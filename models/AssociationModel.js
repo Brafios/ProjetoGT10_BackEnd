@@ -1,57 +1,69 @@
 const supabase = require('../config/supabase');
 
-class Associacao{
-
+class Associacao {
     static async findAll() {
-        const{data, error} = await supabase
-        .from('associacoes')
-        .select('*');
+        const { data, error } = await supabase
+            .from('associacoes')
+            .select('id, nome, cnpj, email, data_fundacao')
+            .order('nome', { ascending: true });
 
-        if (error) throw new Error(error.message);
+        if (error) throw new Error(`Falha ao buscar associações: ${error.message}`);
         return data;
     }
 
     static async findById(id) {
-        const {data, error} = await supabase
-        .from('associacoes')
-        .select('*')
-        .eq('id', id)
-        .single();
+        if (!id) throw new Error('ID não fornecido');
 
-        if (error) throw new Error(error.message);
+        const { data, error } = await supabase
+            .from('associacoes')
+            .select('id, nome, cnpj, email, data_fundacao, descricao, telefone, endereco, representante')
+            .eq('id', id)
+            .single();
+
+        if (error) throw new Error(`Falha ao buscar associação: ${error.message}`);
+        if (!data) throw new Error('Associação não encontrada');
         return data;
     }
 
     static async create(associacaoData) {
-        const {data, error} = await supabase
-        .from('associacoes')
-        .insert([associacaoData])
-        .select()
-        .single();
+        // Validação básica
+        if (!associacaoData.nome) throw new Error('Nome é obrigatório');
+        if (!associacaoData.cnpj) throw new Error('CNPJ é obrigatório');
 
-        if (error) throw new Error(error.message);
+        const { data, error } = await supabase
+            .from('associacoes')
+            .insert([associacaoData])
+            .select('id, nome, cnpj, email, data_fundacao')
+            .single();
+
+        if (error) throw new Error(`Falha ao criar associação: ${error.message}`);
         return data;
     }
 
     static async update(id, associacaoData) {
-        const { data, error } = await supabase
-        .from('associacoes')
-        .update(associacaoData)
-        .eq('id', id)
-        .select()
-        .single();
+        if (!id) throw new Error('ID não fornecido');
 
-        if (error) throw new Error(error.message);
+        const { data, error } = await supabase
+            .from('associacoes')
+            .update(associacaoData)
+            .eq('id', id)
+            .select('id, nome, cnpj, email, data_fundacao')
+            .single();
+
+        if (error) throw new Error(`Falha ao atualizar associação: ${error.message}`);
+        if (!data) throw new Error('Associação não encontrada');
         return data;
     }
 
     static async delete(id) {
-        const{ error } = await supabase
-        .from('associacoes')
-        .delete()
-        .eq('id', id);
+        if (!id) throw new Error('ID não fornecido');
 
-        if (error) throw new Error (error.message);
+        const { error } = await supabase
+            .from('associacoes')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw new Error(`Falha ao deletar associação: ${error.message}`);
         return true;
     }
 }
