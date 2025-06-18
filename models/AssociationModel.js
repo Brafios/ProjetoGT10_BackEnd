@@ -26,7 +26,7 @@ class Associacao {
     }
 
     static async create(associacaoData) {
-        // Validação básica
+
         if (!associacaoData.nome) throw new Error('Nome é obrigatório');
         if (!associacaoData.cnpj) throw new Error('CNPJ é obrigatório');
 
