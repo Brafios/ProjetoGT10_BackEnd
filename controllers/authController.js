@@ -141,25 +141,36 @@ const recuperarSenha = async (req, res) => {
 }
 
 const atualizarSenha = async (req, res) => {
-  const { password, acessToken } = req.body
+  
+  const { password, accessToken, refreshToken } = req.body;
 
-  if (!password || !acessToken){
-    return res.status(400).json({ error: "Nova senha e token de acesso são obrigatórios"})
+  if (!password || !accessToken || !refreshToken) {
+    return res.status(400).json({ error: "Nova senha e tokens são obrigatórios." });
   }
 
-  const { data, error } = await supabase.auth.updateUser(
-    {password: password},
-    {jwt: acessToken}
-  )
+  
+  const { error: sessionError } = await supabase.auth.setSession({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  });
 
-  if (error) {
-    console.error(error);
-    return res.status(401).json({ error: "Token inválido ou expirado. Por favor, solicite um novo link"})
+  if (sessionError) {
+    console.error("Erro ao estabelecer sessão:", sessionError);
+    return res.status(401).json({ error: "Sessão inválida ou expirada." });
   }
 
-  return res.status(200).json({ message: "Senha Atualizada com sucesso"})
+  
+  const { error: updateError } = await supabase.auth.updateUser({
+    password: password,
+  });
 
-}
+  if (updateError) {
+    console.error("Erro ao atualizar usuário:", updateError);
+    return res.status(400).json({ error: "Não foi possível atualizar a senha." });
+  }
+
+  return res.status(200).json({ message: "Senha atualizada com sucesso!" });
+};
 
 module.exports = { 
   registro, 

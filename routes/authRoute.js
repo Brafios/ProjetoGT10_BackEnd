@@ -5,7 +5,7 @@ const { registro, login, recuperarSenha, atualizarSenha } = require('../controll
 
 router.post('/register', registro);
 router.post('/login', login);
-router.post('/recover-password', recuperarSenha)
-router.post('/update-password', atualizarSenha)
+router.post('/request-password-reset', recuperarSenha);
+router.post('/update-password', atualizarSenha);
 
 module.exports = router;
