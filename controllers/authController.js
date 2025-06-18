@@ -121,7 +121,60 @@ const login = async (req, res) => {
   }
 };
 
+const recuperarSenha = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email){
+    return res.status(400).json({ error: "O e-mail é obrigatório."})
+  }
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://projeto-gt-10-full-stack.vercel.app/update-password',
+  });
+
+  if (error){
+    console.error(error);
+    return res.status(500).json({ error: "Erro ao processar a solicitação."});
+  }
+
+  return res.status(200).json({ message: "Se o e-mail estiver cadastrado, um link será enviado"})
+}
+
+const atualizarSenha = async (req, res) => {
+  
+  const { password, accessToken, refreshToken } = req.body;
+
+  if (!password || !accessToken || !refreshToken) {
+    return res.status(400).json({ error: "Nova senha e tokens são obrigatórios." });
+  }
+
+  
+  const { error: sessionError } = await supabase.auth.setSession({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  });
+
+  if (sessionError) {
+    console.error("Erro ao estabelecer sessão:", sessionError);
+    return res.status(401).json({ error: "Sessão inválida ou expirada." });
+  }
+
+  
+  const { error: updateError } = await supabase.auth.updateUser({
+    password: password,
+  });
+
+  if (updateError) {
+    console.error("Erro ao atualizar usuário:", updateError);
+    return res.status(400).json({ error: "Não foi possível atualizar a senha." });
+  }
+
+  return res.status(200).json({ message: "Senha atualizada com sucesso!" });
+};
+
 module.exports = { 
   registro, 
-  login
+  login,
+  atualizarSenha,
+  recuperarSenha
 };
