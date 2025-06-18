@@ -1,52 +1,127 @@
 const supabase = require("../config/supabase");
 const { criarPerfil } = require('../models/UserModel');
+const { validateEmail, validatePassword } = require('../utils/validacoes');
 
 const registro = async (req, res) => {
-  const { email, password, nome, funcao } = req.body;
+  try {
+    const { email, password, nome, funcao } = req.body;
 
-  const { data: authData, error: authError } = await supabase.auth.signUp({
-    email,
-    password,
-  });
+    if (!email || !password || !nome || !funcao) {
+      return res.status(400).json({ 
+        success: false,
+        error: "Todos os campos são obrigatórios" 
+      });
+    }
 
-  if (authError) {
-    return res.status(400).json({ error: authError.message });
+    if (!validateEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        error: "Formato de e-mail inválido"
+      });
+    }
+
+    if (!validatePassword(password)) {
+      return res.status(400).json({
+        success: false,
+        error: "A senha deve ter no mínimo 8 caracteres"
+      });
+    }
+
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (authError) {
+      return res.status(400).json({ 
+        success: false,
+        error: authError.message 
+      });
+    }
+
+    try {
+      await criarPerfil(authData.user.id, nome, funcao);
+      
+      return res.status(201).json({ 
+        success: true,
+        message: 'Usuário registrado com sucesso!',
+        userId: authData.user.id
+      });
+
+    } catch (profileError) {
+      await supabase.auth.admin.deleteUser(authData.user.id);
+      
+      return res.status(400).json({
+        success: false,
+        error: profileError.message
+      });
+    }
+
+  } catch (error) {
+    console.error("Erro no registro:", error);
+    return res.status(500).json({ 
+      success: false,
+      error: "Erro durante o registro",
+      ...(process.env.NODE_ENV === 'development' && { details: error.message })
+    });
   }
-
-  if (!authData.user) {
-    return res.status(500).json({ error: "Erro: Usuário não foi criado na autenticação." });
-  }
-
-  const userId = authData.user.id;
-
-  const profileError = await criarPerfil(userId, nome, funcao);
-
-  if (profileError) {
-    console.error("Erro ao criar perfil:", profileError);
-    return res.status(400).json({ error: `Usuário criado, mas falha ao salvar perfil: ${profileError.message}` });
-  }
-
-  return res.status(201).json({ message: 'Usuário registrado com sucesso!' });
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+    if (!email || !password) {
+      return res.status(400).json({ 
+        success: false,
+        error: "E-mail e senha são obrigatórios" 
+      });
+    }
 
-  if (error) {
-    return res.status(401).json({ error: error.message });
+    if (!validateEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        error: "Formato de e-mail inválido"
+      });
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      const errorMessage = error.message.includes('Invalid login credentials') 
+        ? "E-mail ou senha incorretos" 
+        : error.message;
+      
+      return res.status(401).json({ 
+        success: false,
+        error: errorMessage
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Login bem-sucedido!",
+      user: {
+        id: data.user.id,
+        email: data.user.email
+      },
+      session: data.session
+    });
+
+  } catch (error) {
+    console.error("Erro no login:", error);
+    return res.status(500).json({ 
+      success: false,
+      error: "Erro durante o login",
+      ...(process.env.NODE_ENV === 'development' && { details: error.message })
+    });
   }
-
-  return res.status(200).json({
-    message: "Login bem-sucedido!",
-    user: data.user,
-    session: data.session,
-  });
 };
 
-
-module.exports = { registro, login };
+module.exports = { 
+  registro, 
+  login
+};

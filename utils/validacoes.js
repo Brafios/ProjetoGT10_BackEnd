@@ -5,18 +5,19 @@ function validateEmail(email) {
 
 // VALIDA;ÃO DA SENHA
 function validatePassword(password) {
-  return password.length >= 8 && 
-         /[0-9]/.test(password) && 
-         /[a-zA-Z]/.test(password);
+  return password && password.length >= 8;
 }
 
-// VALIDA;ÃO DE NÍVEIS DE ACESSO
-function validateRole(role) {
-  return ['admin', 'gerente', 'user'].includes(role);
-}
+// const validRoles = ['admin', 'gerente', 'user'];
+// if (!validRoles.includes(funcao)) {
+//   return res.status(400).json({
+//     success: false,
+//     error: `Função inválida. Use: ${validRoles.join(', ')}`
+//   });
+// }
 
 module.exports = {
   validateEmail,
   validatePassword,
-  validateRole
+//   validateRole
 };
