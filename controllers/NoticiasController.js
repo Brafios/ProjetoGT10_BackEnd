@@ -27,7 +27,7 @@ class NoticiaController {
                 res.status(404).json({ error: error.message });
             } else {
                 res.status(500).json({ 
-                    error: 'Erro ao buscar associação',
+                    error: 'Erro ao buscar noticia',
                     details: error.message 
                 });
             }
