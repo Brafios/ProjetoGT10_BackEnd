@@ -172,9 +172,29 @@ const atualizarSenha = async (req, res) => {
   return res.status(200).json({ message: "Senha atualizada com sucesso!" });
 };
 
+const getMe = (req, res) => {
+  if (req.user){
+    res.status(200).json(req.user);
+  } else {
+    res.status(401).json({ error: 'Não autenticado'});
+  }
+}
+
+const logout = async (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token){
+    await supabase.auth.signOut(token);
+  }
+  res.status(200).json({ message: 'Logout realizado com sucesso'});
+}
+
 module.exports = { 
   registro, 
   login,
   atualizarSenha,
-  recuperarSenha
+  recuperarSenha,
+  getMe,
+  logout
 };
