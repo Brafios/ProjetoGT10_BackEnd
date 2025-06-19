@@ -4,8 +4,8 @@ class Associacao {
     static async findAll() {
         const { data, error } = await supabase
             .from('associacoes')
-            .select('id, nome, cnpj, email, data_fundacao')
-            .order('nome', { ascending: true });
+            .select('*')
+            .order('cidade', { ascending: true });
 
         if (error) throw new Error(`Falha ao buscar associações: ${error.message}`);
         return data;
@@ -16,7 +16,7 @@ class Associacao {
 
         const { data, error } = await supabase
             .from('associacoes')
-            .select('id, nome, cnpj, email, data_fundacao, descricao, telefone, endereco, representante')
+            .select('*')
             .eq('id', id)
             .single();
 
