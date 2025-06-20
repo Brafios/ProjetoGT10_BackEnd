@@ -1,4 +1,4 @@
-const Noticia = require('../models/AssociationModel');
+const Noticia = require('../models/NoticiaModel');
 
 class NoticiaController {
     static async list(req, res) {

@@ -5,7 +5,17 @@ const associacaoRoute = require('./routes/AssociationRoute')
 const noticiaRoute = require('./routes/NoticiasRoutes')
 
 const app = express();
-app.use(cors());
+const corsOptions = {
+  origin: [
+    'http://localhost:5173',
+    'https://projeto-gt-10-full-stack.vercel.app'
+  ],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -14,7 +24,7 @@ app.get('/', (req, res) => {
 
 app.use('/auth', AuthRoute);
 app.use('/associacoes', associacaoRoute);
-app.use('/noticia', noticiaRoute);
+app.use('/noticias', noticiaRoute);
 
 
 module.exports = app;
