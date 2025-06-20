@@ -1,4 +1,4 @@
-const { supabse } = require('../config/supabase');
+const supabase = require('../config/supabase');
 
 class Noticia{
 
